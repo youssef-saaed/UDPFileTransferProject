@@ -41,4 +41,4 @@ class FileTransfer:
         packets = FileToSenderPackets(filepath)
         print(packets)
         
-FileTransfer("", 0).SendFile("large file.jpeg")
+FileTransfer("", 0).SendFile("./files/large file.jpeg")
