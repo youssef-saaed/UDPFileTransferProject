@@ -1,16 +1,15 @@
 from socket import (socket, 
                     AF_INET, 
                     SOCK_DGRAM)
-
 from Helpers import *
-
 import random
+import sys
 
 class FileTransfer:
-    def __init__(self, hostname, port, window_size, timeout, file_id):
+    def __init__(self, hostname, port, window_size, timeout):
         self.hostname = hostname
         self.port = port
-        self.file_id = file_id
+        self.file_id = 0
         if window_size < 1:
             raise ValueError("Invalid window size!")
         self.window_size = window_size
@@ -58,13 +57,15 @@ class FileTransfer:
                 seqeunce, file_id = LongBytesToNum(ack[:8]), LongBytesToNum(ack[8:])
             except:
                 pass
+            
+        self.file_id += 1
         
 if __name__ == "__main__":
-    files = ["./files/large file.jpeg", "./files/medium file.jpeg", "./files/small file.jpeg"]
-    window_size = 2
-    timeout = 0.01
-    for i in range(len(files)):
-        file_transfer_obj = FileTransfer("localhost", 1255, window_size, timeout, i)
-        file_transfer_obj.SendFile(files[i])
-        window_size += 1
-        timeout += 0.01
+    if len(sys.argv) != 4:
+        print("Usage: python FileTransfer.py [file name] [window size] [timeout]")
+        sys.exit()
+    file = sys.argv[1]
+    window_size = int(sys.argv[2])
+    timeout = float(sys.argv[3])
+    file_transfer_obj = FileTransfer("localhost", 1255, window_size, timeout)
+    file_transfer_obj.SendFile(file)

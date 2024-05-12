@@ -1,8 +1,8 @@
 from socket import (socket, 
                     AF_INET, 
                     SOCK_DGRAM)
-
 from Helpers import *
+import sys
 
 class FileReceiver:
     def __init__(self, port):
@@ -40,11 +40,10 @@ class FileReceiver:
         self.write_to_file(ordered_packets, save_path)
 
 if __name__ == "__main__":
-    ans = input("Do you want to receive a file? [Y/N]: ")
+    if len(sys.argv) != 2:
+        print("Usage: python Reciever.py [file destination]")
+        sys.exit()
+    file = sys.argv[1]
     receiver = FileReceiver(1255)
-    i = 0
-    while ans.lower()[0] == "y":
-        receiver.receive_file(f"./recieved_files/RECIEVED_{i}.jpeg")
-        i += 1
-        print("Done!")
-        ans = input("Do you want to receive a file? [Y/N]: ")
+    receiver.receive_file(file)
+    print("Done!")
