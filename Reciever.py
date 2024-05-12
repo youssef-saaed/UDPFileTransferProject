@@ -24,24 +24,27 @@ class FileReceiver:
                 file.write(packet["Data"])
 
     def receive_file(self, save_path):
-        c = 0
         packets = []
         recieved_seq = set()
         while True:
             packet, address = self.sock.recvfrom(256)
             unpacked_packet = Unpack(packet)
-            if c % 11: 
-                self.send_acknowledgement(unpacked_packet["Sequence"], unpacked_packet["FileID"], address)
-                if not unpacked_packet["Sequence"] in recieved_seq:
-                    packets.append(unpacked_packet)
+            self.send_acknowledgement(unpacked_packet["Sequence"], unpacked_packet["FileID"], address)
+            if not unpacked_packet["Sequence"] in recieved_seq:
+                packets.append(unpacked_packet)
                 recieved_seq.add(unpacked_packet["Sequence"])
-                
-                if unpacked_packet["Trailer"] == 1:
-                    break
-            c += 1
+            
+            if unpacked_packet["Trailer"] == 1:
+                break
         ordered_packets = self.order_packets(packets)
         self.write_to_file(ordered_packets, save_path)
 
 if __name__ == "__main__":
+    ans = input("Do you want to receive a file? [Y/N]: ")
     receiver = FileReceiver(1255)
-    receiver.receive_file("RECIEVED.jpeg")
+    i = 0
+    while ans.lower()[0] == "y":
+        receiver.receive_file(f"./recieved_files/RECIEVED_{i}.jpeg")
+        i += 1
+        print("Done!")
+        ans = input("Do you want to receive a file? [Y/N]: ")

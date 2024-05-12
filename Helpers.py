@@ -28,7 +28,7 @@ def FileToSenderPackets(filepath, file_id):
             packets.append(packet)
             sequence += 1
             buffer = file_handler.read(239)
-    packets[len(packets) - 1][16] = 1
+    packets[-1][16] = 1
     return [bytes(packet) for packet in packets]
 
 def Unpack(packet):
