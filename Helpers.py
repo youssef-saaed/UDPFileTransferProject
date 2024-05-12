@@ -37,3 +37,13 @@ def Unpack(packet):
     trailer = int(packet[16])
     data = packet[17:]
     return {"Sequence": sequence, "FileID": file_id, "Trailer": trailer, "Data": data}
+
+def MakeReceiverPacket(sequence, file_id):
+    sequence_bytes = NumToLongBytes(sequence)
+    file_id_bytes = NumToLongBytes(file_id)
+    return bytes(sequence_bytes + file_id_bytes)
+
+def Unpack_ack(packet):
+    sequence = LongBytesToNum(packet[:8])
+    file_id = LongBytesToNum(packet[8:16])
+    return {"Sequence": sequence, "FileID": file_id}

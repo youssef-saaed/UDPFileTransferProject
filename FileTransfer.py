@@ -46,4 +46,4 @@ class FileTransfer:
             window_end = min(window_start + self.window_size, len(packets))
         
 if __name__ == "__main__":
-    FileTransfer("localhost", 1255).SendFile("./files/large file.jpeg")
+    FileTransfer("localhost", 1255)
