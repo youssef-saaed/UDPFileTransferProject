@@ -2,43 +2,48 @@ from socket import (socket,
                     AF_INET, 
                     SOCK_DGRAM)
 
-def NumToLongBytes(num):
-    num_bytes = [0] * 8
-    for i in range(7, -1, -1):
-        num_bytes[i] = num % 256
-        num //= 256
-    return num_bytes   
-
-def MakeSenderPacket(buffer, sequence):
-    buffer = list(buffer)
-    buffer.insert(0, 0)
-    sequence_bytes = NumToLongBytes(sequence)
-    return sequence_bytes + buffer
-
-def FileToSenderPackets(filepath):
-    packets = []
-    sequence = 0
-    with open(filepath, "rb") as file_handler:
-        buffer = file_handler.read(247)
-        while buffer:
-            packet = MakeSenderPacket(buffer, sequence)
-            packets.append(packet)
-            sequence += 1
-            buffer = file_handler.read(247)
-    packets[len(packets) - 1][8] = 1
-    return [bytes(packet) for packet in packets]
+from Helpers import *
 
 class FileTransfer:
     def __init__(self, hostname, port, window_size = 3):
         self.hostname = hostname
         self.port = port
+        self.file_id = 0
         if window_size < 1:
             raise ValueError("Invalid window size!")
         self.window_size = window_size
         self.socket = socket(AF_INET, SOCK_DGRAM)
         
     def SendFile(self, filepath):
-        packets = FileToSenderPackets(filepath)
-        print(packets)
+        packets = FileToSenderPackets(filepath, self.file_id)
+        window_start = 0
+        window_end = min(window_start + self.window_size, len(packets))
+        while window_start < len(packets):           
+            acks = set()
+            
+            for i in range(window_start, window_end):
+                self.socket.sendto(packets[i], (self.hostname, self.port))
+                
+            timeout = 0
+            while timeout < 0.01 * (window_end - window_start) and len(acks) < window_end - window_start:
+                try:
+                    self.socket.settimeout(0.01)
+                    ack, _ = self.socket.recvfrom(16)
+                    seqeunce, file_id = LongBytesToNum(ack[:8]), LongBytesToNum(ack[8:])
+                    if file_id == self.file_id:
+                        acks.add(seqeunce)
+                except:
+                    pass
+                timeout += 0.01
+            
+            if len(acks) == window_end - window_start:
+                window_start = window_end
+            else:
+                for i in range(window_start, window_end):
+                    if not i in acks:
+                        window_start = i
+                        break
+            window_end = min(window_start + self.window_size, len(packets))
         
-FileTransfer("", 0).SendFile("./files/large file.jpeg")
+if __name__ == "__main__":
+    FileTransfer("localhost", 1255).SendFile("./files/large file.jpeg")
