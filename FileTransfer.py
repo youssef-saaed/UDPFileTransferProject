@@ -22,7 +22,7 @@ class FileTransfer:
         self.socket.settimeout(self.timeout)
         self.packet_log = []
         self.secret_key = secret_key[:8].encode()
-        
+
     def SendFile(self, filepath):
         start_T = time.time()
         packets = FileToSenderPackets(filepath, self.file_id)
@@ -80,13 +80,19 @@ class FileTransfer:
         self.file_id += 1
         end_T = time.time()
         overall_time = end_T - start_T
-        print(f"File sent: {filepath}",
+        print(f"File received: {filepath}",
               f"Start time: {start_T}",
               f"End time: {end_T}",
               f"Elapsed time: {overall_time} seconds",
               f"Number of packets: {len(packets)}",
               f"Number of bytes: {numOfBytes}",
-              f"Number of retransmits: {retransmits}",
+              f"Throughput: {numOfBytes/overall_time} bytes/sec",
+              f"Retransmits: {retransmits}",
+              f"Timeout: {self.timeout} seconds",
+              f"Window size: {self.window_size}",
+              f"Packet Loss: {len(packets) - len(acks)}",
+              f"Packet Loss Rate: {(len(packets) - len(acks))/len(packets)}",
+              f"packet/sec: {len(packets)/overall_time}",
               "Dn", sep="\n")
         self.plot_packet_log()
 
@@ -122,5 +128,6 @@ if __name__ == "__main__":
     file = sys.argv[1]
     window_size = int(sys.argv[2])
     timeout = float(sys.argv[3])
-    file_transfer_obj = FileTransfer("localhost", 1255, window_size, timeout, secret_key)
+    file_transfer_obj = FileTransfer(
+        "localhost", 1255, window_size, timeout, secret_key)
     file_transfer_obj.SendFile(file)
