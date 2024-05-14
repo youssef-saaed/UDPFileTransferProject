@@ -25,7 +25,7 @@ class FileTransfer:
 
     def SendFile(self, filepath):
         start_T = time.time()
-        packets = FileToSenderPackets(filepath, self.file_id)
+        packets = FileToSenderPackets(filepath, self.file_id, self.secret_key)
         window_start = 0
         window_end = min(window_start + self.window_size, len(packets) - 1)
         numOfBytes = 0

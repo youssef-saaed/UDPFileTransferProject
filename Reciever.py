@@ -7,13 +7,13 @@ import time
 import matplotlib.pyplot as plt
 from datetime import datetime
 
-
 class FileReceiver:
-    def __init__(self, port):
+    def __init__(self, port, secret_key):
         self.port = port
         self.sock = socket(AF_INET, SOCK_DGRAM)
         self.sock.bind(("localhost", port))
         self.packet_log = []
+        self.secret_key = secret_key[:8].encode()
 
     def send_acknowledgement(self, sequence, file_id, address):
         ack_packet = MakeReceiverPacket(sequence, file_id)
@@ -34,9 +34,11 @@ class FileReceiver:
         recieved_seq = set()
         numOfBytes = 0
         while True:
-            packet, address = self.sock.recvfrom(256)
+            packet, address = self.sock.recvfrom(512)
             recv_T = datetime.now()
-            unpacked_packet = Unpack(packet)
+            unpacked_packet = Unpack(packet, self.secret_key)
+            if unpacked_packet["HashedKey"] != hashlib.sha256(self.secret_key).digest():
+                continue
             self.send_acknowledgement(
                 unpacked_packet["Sequence"], unpacked_packet["FileID"], address)
             if not unpacked_packet["Sequence"] in recieved_seq:
@@ -88,6 +90,6 @@ if __name__ == "__main__":
         sys.exit()
     secret_key = "pass1234"
     file = sys.argv[1]
-    receiver = FileReceiver(1255)
+    receiver = FileReceiver(1255, secret_key)
     receiver.receive_file(file)
     print("Done!")
