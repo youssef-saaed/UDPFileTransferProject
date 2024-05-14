@@ -1,3 +1,8 @@
+def gen_key(key, size):
+    f_repeats = size // len(key)
+    remainder = size - f_repeats * len(key)
+    return key[-remainder - 1 : -1] + key * f_repeats
+
 def NumToLongBytes(num):
     num_bytes = [0] * 8
     for i in range(7, -1, -1):

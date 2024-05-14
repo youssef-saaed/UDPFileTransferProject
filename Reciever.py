@@ -43,6 +43,7 @@ if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("Usage: python Reciever.py [file destination]")
         sys.exit()
+    secret_key = "pass1234"
     file = sys.argv[1]
     receiver = FileReceiver(1255)
     receiver.receive_file(file)

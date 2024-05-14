@@ -6,7 +6,7 @@ import random
 import sys
 
 class FileTransfer:
-    def __init__(self, hostname, port, window_size, timeout):
+    def __init__(self, hostname, port, window_size, timeout, secret_key):
         self.hostname = hostname
         self.port = port
         self.file_id = 0
@@ -16,6 +16,7 @@ class FileTransfer:
         self.socket = socket(AF_INET, SOCK_DGRAM)
         self.timeout = timeout
         self.socket.settimeout(self.timeout)
+        self.secret_key = secret_key.encode()
         
     def SendFile(self, filepath):
         packets = FileToSenderPackets(filepath, self.file_id)
@@ -64,8 +65,9 @@ if __name__ == "__main__":
     if len(sys.argv) != 4:
         print("Usage: python FileTransfer.py [file name] [window size] [timeout]")
         sys.exit()
+    secret_key = "pass1234"
     file = sys.argv[1]
     window_size = int(sys.argv[2])
     timeout = float(sys.argv[3])
-    file_transfer_obj = FileTransfer("localhost", 1255, window_size, timeout)
+    file_transfer_obj = FileTransfer("localhost", 1255, window_size, timeout, secret_key)
     file_transfer_obj.SendFile(file)
