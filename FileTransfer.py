@@ -20,6 +20,8 @@ class FileTransfer:
         self.socket = socket(AF_INET, SOCK_DGRAM)
         self.timeout = timeout
         self.socket.settimeout(self.timeout)
+        self.packet_log = []
+        self.secret_key = secret_key[:8].encode()
         
     def SendFile(self, filepath):
         start_T = time.time()
