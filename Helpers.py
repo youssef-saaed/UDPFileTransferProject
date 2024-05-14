@@ -8,7 +8,8 @@ def NumToLongBytes(num):
     for i in range(7, -1, -1):
         num_bytes[i] = num % 256
         num //= 256
-    return num_bytes   
+    return num_bytes
+
 
 def LongBytesToNum(bytes_arr):
     num = 0
@@ -16,12 +17,14 @@ def LongBytesToNum(bytes_arr):
         num += num * 256 + bytes_arr[i]
     return num
 
+
 def MakeSenderPacket(buffer, sequence, file_id):
     buffer = list(buffer)
     buffer.insert(0, 0)
     sequence_bytes = NumToLongBytes(sequence)
     file_id_bytes = NumToLongBytes(file_id)
     return sequence_bytes + file_id_bytes + buffer
+
 
 def FileToSenderPackets(filepath, file_id):
     packets = []
@@ -36,6 +39,7 @@ def FileToSenderPackets(filepath, file_id):
     packets[-1][16] = 1
     return [bytes(packet) for packet in packets]
 
+
 def Unpack(packet):
     sequence = LongBytesToNum(packet[:8])
     file_id = LongBytesToNum(packet[8:16])
@@ -43,10 +47,12 @@ def Unpack(packet):
     data = packet[17:]
     return {"Sequence": sequence, "FileID": file_id, "Trailer": trailer, "Data": data}
 
+
 def MakeReceiverPacket(sequence, file_id):
     sequence_bytes = NumToLongBytes(sequence)
     file_id_bytes = NumToLongBytes(file_id)
     return bytes(sequence_bytes + file_id_bytes)
+
 
 def Unpack_ack(packet):
     sequence = LongBytesToNum(packet[:8])
