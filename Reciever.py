@@ -6,10 +6,6 @@ import sys
 import time
 import matplotlib.pyplot as plt
 from datetime import datetime
-<<<<<<< HEAD
-
-=======
->>>>>>> 5f2b4ecbe0f0c77f8667fe6b9438e27eafa08133
 
 class FileReceiver:
     def __init__(self, port, secret_key):
@@ -64,15 +60,7 @@ class FileReceiver:
               f"Elapsed time: {overall_time} seconds",
               f"Number of packets: {len(packets)}",
               f"Number of bytes: {numOfBytes}",
-              f"Throughput: {numOfBytes/overall_time} bytes/sec",
-              f"Packet Loss: {len(packets) - len(recieved_seq)}",
-              f"Packet Loss Rate: {
-                  (len(packets) - len(recieved_seq))/len(packets)}",
-              f"Packet Loss Sequence Numbers: {
-                  set(range(len(packets))) - recieved_seq}",
-              f"packet/sec: {len(packets)/overall_time}",
-              "Dn",
-              sep="\n")
+              "Dn", sep="\n")
         print()
         self.plot_packet_log()
 
