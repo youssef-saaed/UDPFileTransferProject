@@ -41,8 +41,8 @@ def FileToSenderPackets(filepath, file_id, secret_key):
     packets[-1][16] = 1
     packets = [bytes(packet) for packet in packets]
     hmac_key = hashlib.sha256(secret_key).digest()
-    key = gen_key(hmac_key, len(packets[0]) + 32)
     for i in range(len(packets)):
+        key = gen_key(hmac_key, len(packets[i]) + 32)
         packets[i] += hmac_key
         packets[i] = bytes([a ^ b for a, b in zip(packets[i], key)])
     return packets
